@@ -44,7 +44,8 @@ export default function CreateOfferModal({ isOpen, onClose, onPickLocation, pick
             if (apt) addressParts.push(`Кв ${apt}`);
             const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : 'Без деталей';
 
-            const res = await fetch('http://localhost:8080/offers', {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            const res = await fetch(`${apiUrl}/offers`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

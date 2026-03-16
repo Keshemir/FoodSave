@@ -26,7 +26,8 @@ export default function ChatPage() {
 
     // Load chat history from DB
     useEffect(() => {
-        fetch(`http://localhost:8080/messages?user_id=${MY_USER_ID}&peer_id=${sellerId}`)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+        fetch(`${apiUrl}/messages?user_id=${MY_USER_ID}&peer_id=${sellerId}`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) setMessages(data);
@@ -36,7 +37,9 @@ export default function ChatPage() {
 
     // Connect WebSocket
     useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:8080/ws/chat?user_id=${MY_USER_ID}&peer_id=${sellerId}`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+        const wsUrl = apiUrl.startsWith('https') ? apiUrl.replace('https', 'wss') : apiUrl.replace('http', 'ws');
+        const ws = new WebSocket(`${wsUrl}/ws/chat?user_id=${MY_USER_ID}&peer_id=${sellerId}`);
         wsRef.current = ws;
 
         ws.onopen = () => setConnected(true);

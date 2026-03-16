@@ -1,6 +1,6 @@
 import { PublicOffer } from './api.types';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export async function fetchOffers(): Promise<PublicOffer[]> {
     try {
