@@ -14,6 +14,8 @@ services:
           property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://foodsave-frontend.onrender.com
+      - key: PORT
+        value: 8080
 
   # Наш Next.js Frontend
   - type: web
@@ -26,6 +28,8 @@ services:
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://foodsave-backend.onrender.com
+      - key: PORT
+        value: 3000
 
     # We must pass the NEXT_PUBLIC_API_URL as a buildArg for Next.js to embed it into the frontend bundle
     dockerBuildArgs:

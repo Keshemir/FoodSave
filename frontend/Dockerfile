@@ -33,7 +33,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Expose port 3000
+# Expose port (Render defaults to 10000 if PORT is not set, Next.js defaults to 3000)
+ENV PORT=3000
 EXPOSE 3000
 
 # Start the application
