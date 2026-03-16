@@ -27,13 +27,12 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://foodsave-backend.onrender.com
+        fromService:
+          type: web
+          name: foodsave-backend
+          envVarKey: RENDER_EXTERNAL_URL
       - key: PORT
-        value: 3000
-
-    # We must pass the NEXT_PUBLIC_API_URL as a buildArg for Next.js to embed it into the frontend bundle
-    dockerBuildArgs:
-      - NEXT_PUBLIC_API_URL=https://foodsave-backend.onrender.com
+        value: 10000
 
 databases:
   # База данных PostgreSQL
