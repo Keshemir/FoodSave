@@ -24,18 +24,18 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-# Set environment variable to production
 ENV NODE_ENV=production
+# Render автоматически назначает порт 10000, нам нужно заставить Next.js его слушать
+ENV PORT=10000
+# Это важно: заставляем сервер слушать внешний трафик, а не только локальный
+ENV HOSTNAME="0.0.0.0"
 
-# Copy necessary files from builder
-COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Expose port (Render defaults to 10000 if PORT is not set, Next.js defaults to 3000)
-ENV PORT=3000
-EXPOSE 3000
+# Убираем копирование next.config.ts, в standalone режиме он не нужен
+# Порт 10000 для Render
+EXPOSE 10000
 
-# Start the application
 CMD ["node", "server.js"]
