@@ -12,6 +12,8 @@ services:
         fromDatabase:
           name: foodsave-db
           property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://foodsave-frontend.onrender.com
 
   # Наш Next.js Frontend
   - type: web
