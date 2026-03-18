@@ -15,7 +15,7 @@ type OfferController struct {
 
 func (ctrl *OfferController) CreateOffer(c *gin.Context) {
 	var input struct {
-		OwnerID    uint               `json:"owner_id"`
+		OwnerID    uint               `json:"owner_id"` // Will be ignored in favor of context
 		Type       models.OfferType   `json:"type"`
 		Category   string             `json:"category"`
 		Title      string             `json:"title"`
@@ -39,8 +39,17 @@ func (ctrl *OfferController) CreateOffer(c *gin.Context) {
 		expiry = time.Now().Add(24 * time.Hour)
 	}
 
+	// ALWAYS USE THE AUTHENTICATED USER FROM MIDDLEWARE
+	var ownerID uint
+	if userObj, exists := c.Get("db_user"); exists {
+		ownerID = userObj.(models.User).ID
+	} else {
+		// Fallback for testing if middleware is skipped, though it shouldn't be
+		ownerID = input.OwnerID
+	}
+
 	offer := models.Offer{
-		OwnerID:    input.OwnerID,
+		OwnerID:    ownerID,
 		Type:       input.Type,
 		Category:   input.Category,
 		Title:      input.Title,
@@ -57,12 +66,6 @@ func (ctrl *OfferController) CreateOffer(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
-
-	// Fetch owner to know role for response (optional) or just return what we have
-	// For API consistency let's return PublicOffer
-	// We need to fetch the owner to know the role for ToPublic, or just default to raw for the creator.
-	// Let's assume creator sees raw.
-	// But to simplify, we will just return the created object.
 
 	c.JSON(http.StatusCreated, offer)
 }

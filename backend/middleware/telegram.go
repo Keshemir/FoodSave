@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"foodsave/models"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -103,7 +104,7 @@ func TelegramAuth(db *gorm.DB) gin.HandlerFunc {
 					}
 					db.Create(&dbUser)
 				}
-				
+
 				c.Set("tg_user", tgUser)
 				c.Set("db_user", dbUser)
 			}
