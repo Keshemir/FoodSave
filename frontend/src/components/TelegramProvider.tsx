@@ -1,10 +1,12 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import WebApp from '@twa-dev/sdk';
+
+// We just use the globally injected Telegram script instead of the npm package
+// to avoid "window is not defined" during Next.js SSR.
 
 interface TelegramContextType {
-  webApp: typeof WebApp | null;
+  webApp: any | null;
   user: any | null;
 }
 
@@ -14,14 +16,15 @@ const TelegramContext = createContext<TelegramContextType>({
 });
 
 export const TelegramProvider = ({ children }: { children: React.ReactNode }) => {
-  const [webApp, setWebApp] = useState<typeof WebApp | null>(null);
+  const [webApp, setWebApp] = useState<any | null>(null);
 
   useEffect(() => {
     // WebApp should only be initialized on the client side
-    if (typeof window !== 'undefined' && WebApp) {
-      WebApp.ready();
-      WebApp.expand();
-      setWebApp(WebApp);
+    const app = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) || null;
+    if (app) {
+      app.ready();
+      app.expand();
+      setWebApp(app);
     }
   }, []);
 
