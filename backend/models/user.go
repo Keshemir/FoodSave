@@ -13,7 +13,8 @@ const (
 
 type User struct {
 	gorm.Model
-	AppleID string  `gorm:"uniqueIndex;not null" json:"apple_id"`
-	Role    Role    `gorm:"not null" json:"role"`
-	Rating  float64 `gorm:"not null;default:5.0" json:"rating"`
+	AppleID    string  `gorm:"uniqueIndex" json:"apple_id"`
+	TelegramID int64   `gorm:"uniqueIndex" json:"telegram_id"`
+	Role       Role    `gorm:"not null" json:"role"`
+	Rating     float64 `gorm:"not null;default:5.0" json:"rating"`
 }

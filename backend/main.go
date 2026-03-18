@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"foodsave/controllers"
+	"foodsave/middleware"
 	"foodsave/models"
 
 	"github.com/gin-contrib/cors"
@@ -74,14 +75,16 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// Routes
-	r.POST("/users", userCtrl.CreateUser)
-	r.POST("/offers", offerCtrl.CreateOffer)
-	r.GET("/offers", offerCtrl.GetOffers)
-
-	// Chat
-	r.GET("/ws/chat", chatCtrl.ChatWebSocket)
-	r.GET("/messages", chatCtrl.GetMessages)
+	// Protected Routes
+	api := r.Group("/")
+	api.Use(middleware.TelegramAuth(db))
+	{
+		api.POST("/users", userCtrl.CreateUser)
+		api.POST("/offers", offerCtrl.CreateOffer)
+		api.GET("/offers", offerCtrl.GetOffers)
+		api.GET("/ws/chat", chatCtrl.ChatWebSocket)
+		api.GET("/messages", chatCtrl.GetMessages)
+	}
 
 	// Health check
 	r.GET("/health", func(c *gin.Context) {

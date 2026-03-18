@@ -45,13 +45,18 @@ export default function CreateOfferModal({ isOpen, onClose, onPickLocation, pick
             const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : 'Без деталей';
 
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            const initData = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initData) || '';
+            const tgUser = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initDataUnsafe?.user) || null;
+            const currentUserId = tgUser?.id || 1;
+
             const res = await fetch(`${apiUrl}/offers`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(initData ? { 'Authorization': `tma ${initData}` } : {})
                 },
                 body: JSON.stringify({
-                    owner_id: 1,
+                    owner_id: currentUserId,
                     type: type,
                     category: category,
                     title: title,

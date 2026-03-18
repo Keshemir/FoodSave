@@ -27,11 +27,19 @@ export default function ChatPage() {
     // Load chat history from DB
     useEffect(() => {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-        fetch(`${apiUrl}/messages?user_id=${MY_USER_ID}&peer_id=${sellerId}`)
+        const initData = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initData) || '';
+        
+        // Also we can dynamically use the Telegram user ID if MY_USER_ID is not provided
+        const tgUser = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initDataUnsafe?.user) || null;
+        const currentUserId = tgUser?.id || MY_USER_ID;
+
+        fetch(`${apiUrl}/messages?user_id=${currentUserId}&peer_id=${sellerId}`, {
+            headers: initData ? { 'Authorization': `tma ${initData}` } : undefined
+        })
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) setMessages(data);
-            })
+        })
             .catch(() => { });
     }, [sellerId]);
 
@@ -39,7 +47,19 @@ export default function ChatPage() {
     useEffect(() => {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
         const wsUrl = apiUrl.startsWith('https') ? apiUrl.replace('https', 'wss') : apiUrl.replace('http', 'ws');
-        const ws = new WebSocket(`${wsUrl}/ws/chat?user_id=${MY_USER_ID}&peer_id=${sellerId}`);
+        
+        const initData = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initData) || '';
+        const tgUser = (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initDataUnsafe?.user) || null;
+        const currentUserId = tgUser?.id || MY_USER_ID;
+
+        const url = new URL(`${wsUrl}/ws/chat`);
+        url.searchParams.append('user_id', String(currentUserId));
+        url.searchParams.append('peer_id', String(sellerId));
+        if (initData) {
+            url.searchParams.append('initData', initData); // Pass initData in URL for WebSockets since we can't easily send Headers
+        }
+
+        const ws = new WebSocket(url.toString());
         wsRef.current = ws;
 
         ws.onopen = () => setConnected(true);

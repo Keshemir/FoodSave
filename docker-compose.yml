@@ -25,6 +25,7 @@ services:
       - "8080:8080"
     environment:
       - DATABASE_URL=host=db user=vapor_username password=vapor_password dbname=vapor_database port=5432 sslmode=disable TimeZone=Asia/Almaty
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
     depends_on:
       db:
         condition: service_healthy
