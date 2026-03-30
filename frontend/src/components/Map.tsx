@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic';
 
 interface MapProps {
     onCenterChange?: (lat: number, lng: number) => void;
+    searchQuery?: string;
+    activeCategory?: string | null;
 }
 
 const MapInner = dynamic(() => import('./MapInner'), {

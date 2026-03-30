@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import Map from '../components/Map';
 import BottomSheet from '../components/BottomSheet';
-import { Search, Navigation, Utensils, Coffee, Wine, Plus, ChevronUp, LocateFixed } from 'lucide-react';
+import { Search, LocateFixed, Flame, Croissant, CakeSlice, CupSoda } from 'lucide-react';
 
-// window.__mapCenterCallback is registered by MainLayout
 declare global {
     interface Window {
         __mapCenterCallback?: (lat: number, lng: number) => void;
@@ -14,6 +13,7 @@ declare global {
 
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
     const famousCafes = [
         { id: 1, name: 'Скуратов Ростерс', author: '@alex_coffee', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=400&h=300', span: 'col-span-2 row-span-1 h-32' },
@@ -22,12 +22,18 @@ export default function Home() {
         { id: 4, name: 'Surf Coffee', author: '@surf_vibes', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=400&h=300', span: 'col-span-2 row-span-1 h-32' },
     ];
 
+    const categories = [
+        { id: 'hot', label: 'Горячее', icon: Flame },
+        { id: 'bakery', label: 'Выпечка', icon: Croissant },
+        { id: 'cold', label: 'Десерты', icon: CakeSlice }, // mapped to 'cold'
+        { id: 'drinks', label: 'Напитки', icon: CupSoda },
+    ];
+
     const handleGeolocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     console.log("Current Location:", position.coords.latitude, position.coords.longitude);
-                    // In a full implementation, this would pan the map to these coordinates
                     alert(`Текущая локация получена: \n${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
                 },
                 (error) => {
@@ -44,6 +50,8 @@ export default function Home() {
                 onCenterChange={(lat, lng) => {
                     window.__mapCenterCallback?.(lat, lng);
                 }}
+                searchQuery={searchQuery}
+                activeCategory={activeCategory}
             />
 
             {/* Discover UI Overlay */}
@@ -52,49 +60,49 @@ export default function Home() {
                 {/* Top Section - Search & Location */}
                 <div className="pointer-events-auto px-4 flex items-start gap-3 max-w-md mx-auto w-full justify-between">
                     
-                    {/* Compact Search Bar Top-Left */}
-                    <div className="relative flex-1 max-w-[240px]">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    {/* Compact Search Bar with Integrated Geolocation */}
+                    <div className="relative flex-1 flex items-center bg-white/90 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+                        <div className="pl-4 pr-2 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-gray-500" />
                         </div>
                         <input
                             type="text"
-                            className="block w-full pl-10 pr-4 py-3 bg-white/80 backdrop-blur-md text-gray-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none focus:ring-2 focus:ring-green-500 placeholder-gray-500 font-medium text-sm transition-all"
-                            placeholder="Поиск..."
+                            className="block w-full py-3 bg-transparent text-gray-900 border-none focus:ring-0 placeholder-gray-500 font-medium text-sm outline-none"
+                            placeholder="Найти еду..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
+                        <button 
+                            onClick={handleGeolocation}
+                            className="p-3 text-blue-600 hover:text-blue-700 transition-colors active:scale-95 border-l border-gray-100"
+                            title="Поделиться локацией"
+                        >
+                            <LocateFixed className="h-5 w-5" />
+                        </button>
                     </div>
-
-                    {/* Geolocation Button */}
-                    <button 
-                        onClick={handleGeolocation}
-                        className="bg-white/90 backdrop-blur-md p-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shrink-0 text-blue-600 hover:bg-white transition-colors active:scale-95"
-                    >
-                        <LocateFixed className="h-5 w-5" />
-                    </button>
-                    
                 </div>
 
-                {/* Floating Filters (placed near bottom of the available free space) */}
+                {/* Floating Category Filters */}
                 <div className="mt-auto pointer-events-auto px-4 w-full max-w-md mx-auto">
                     <div className="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-2">
-                        <button className="bg-black/90 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-2 shrink-0 shadow-sm border border-black/10">
-                            <span>discover</span>
-                            <ChevronUp className="w-4 h-4 text-white p-[2px] rounded-full bg-white/20" />
-                        </button>
-                        <button className="bg-white/70 backdrop-blur-md px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border border-white/40 text-gray-800 transition-colors hover:bg-white/90">
-                            <Utensils className="w-4 h-4 text-gray-500" /> eat
-                        </button>
-                        <button className="bg-white/70 backdrop-blur-md px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border border-white/40 text-gray-800 transition-colors hover:bg-white/90">
-                            <Coffee className="w-4 h-4 text-gray-500" /> café
-                        </button>
-                        <button className="bg-white/70 backdrop-blur-md px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border border-white/40 text-gray-800 transition-colors hover:bg-white/90">
-                            <Wine className="w-4 h-4 text-gray-500" /> bar
-                        </button>
-                        <button className="bg-white/70 backdrop-blur-md w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-white/40 transition-colors hover:bg-white/90">
-                            <Plus className="w-5 h-5 text-gray-500" />
-                        </button>
+                        {categories.map((cat) => {
+                            const isActive = activeCategory === cat.id;
+                            const Icon = cat.icon;
+                            return (
+                                <button 
+                                    key={cat.id}
+                                    onClick={() => setActiveCategory(isActive ? null : cat.id)}
+                                    className={`px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border transition-all ${
+                                        isActive 
+                                        ? 'bg-[#4CAF50] text-white border-[#4CAF50] shadow-md scale-105' 
+                                        : 'bg-white/70 backdrop-blur-md border-white/40 text-gray-800 hover:bg-white/90'
+                                    }`}
+                                >
+                                    <Icon className="w-4 h-4" /> 
+                                    {cat.label}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -103,7 +111,7 @@ export default function Home() {
             {/* Draggable Bottom Sheet Layer */}
             <BottomSheet>
                 <div className="pb-8">
-                    <h2 className="text-xl font-bold mb-4 tracking-tight text-gray-900 px-1">знаменитые кафешки</h2>
+                    <h2 className="text-xl font-bold mb-4 tracking-tight text-gray-900 px-1">Знаменитые кафешки</h2>
                     
                     {/* Bento Grid Layout for Cards */}
                     <div className="grid grid-cols-2 gap-3 pb-8">

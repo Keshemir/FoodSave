@@ -24,3 +24,19 @@ body {
   color: var(--tg-theme-text-color, var(--foreground));
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Leaflet Popup Overrides for Marketplace Preview Cards */
+.custom-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+}
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: auto !important;
+}
+.custom-popup .leaflet-popup-tip-container {
+  margin-top: -1px;
+}
