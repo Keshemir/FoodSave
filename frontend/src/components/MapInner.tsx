@@ -32,7 +32,7 @@ const FreeIcon = L.icon({
 });
 
 // Helper component to listen to map events
-function MapController({ onCenterChange }: { onCenterChange?: (lat: number, lng: number) => void }) {
+function MapController({ onCenterChange, onMapClick }: { onCenterChange?: (lat: number, lng: number) => void, onMapClick?: () => void }) {
     const map = useMapEvents({
         moveend: () => {
             if (onCenterChange) {
@@ -40,6 +40,9 @@ function MapController({ onCenterChange }: { onCenterChange?: (lat: number, lng:
                 onCenterChange(center.lat, center.lng);
             }
         },
+        click: () => {
+            if (onMapClick) onMapClick();
+        }
     });
     return null;
 }
@@ -48,9 +51,10 @@ interface MapInnerProps {
     onCenterChange?: (lat: number, lng: number) => void;
     searchQuery?: string;
     activeCategory?: string | null;
+    onMapClick?: () => void;
 }
 
-export default function MapInner({ onCenterChange, searchQuery, activeCategory }: MapInnerProps) {
+export default function MapInner({ onCenterChange, searchQuery, activeCategory, onMapClick }: MapInnerProps) {
     const [offers, setOffers] = useState<PublicOffer[]>([]);
     // Coordinates for Astana, Kazakhstan
     const astanaRaw = [51.169392, 71.449074];

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Map from '../components/Map';
 import BottomSheet from '../components/BottomSheet';
-import { Search, LocateFixed, Flame, Croissant, CakeSlice, CupSoda } from 'lucide-react';
+import { Search, LocateFixed, Flame, Croissant, CakeSlice, CupSoda, Store } from 'lucide-react';
 
 declare global {
     interface Window {
@@ -14,6 +14,7 @@ declare global {
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
+    const [showBottomSheet, setShowBottomSheet] = useState(true);
 
     const famousCafes = [
         { id: 1, name: 'Скуратов Ростерс', author: '@alex_coffee', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=400&h=300', span: 'col-span-2 row-span-1 h-32' },
@@ -25,7 +26,7 @@ export default function Home() {
     const categories = [
         { id: 'hot', label: 'Горячее', icon: Flame },
         { id: 'bakery', label: 'Выпечка', icon: Croissant },
-        { id: 'cold', label: 'Десерты', icon: CakeSlice }, // mapped to 'cold'
+        { id: 'cold', label: 'Десерты', icon: CakeSlice },
         { id: 'drinks', label: 'Напитки', icon: CupSoda },
     ];
 
@@ -52,39 +53,15 @@ export default function Home() {
                 }}
                 searchQuery={searchQuery}
                 activeCategory={activeCategory}
+                onMapClick={() => setShowBottomSheet(false)}
             />
 
-            {/* Discover UI Overlay */}
-            <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden flex flex-col pt-[72px] pb-[160px]">
+            {/* Discover UI Overlay (Docked to bottom, above Navbar which is h-16/bottom-0) */}
+            <div className={`absolute inset-x-0 bottom-[72px] pointer-events-none z-10 flex flex-col justify-end gap-3 pb-3 transition-opacity duration-300 ${showBottomSheet ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
                 
-                {/* Top Section - Search & Location */}
-                <div className="pointer-events-auto px-4 flex items-start gap-3 max-w-md mx-auto w-full justify-between">
-                    
-                    {/* Compact Search Bar with Integrated Geolocation */}
-                    <div className="relative flex-1 flex items-center bg-white/90 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
-                        <div className="pl-4 pr-2 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-gray-500" />
-                        </div>
-                        <input
-                            type="text"
-                            className="block w-full py-3 bg-transparent text-gray-900 border-none focus:ring-0 placeholder-gray-500 font-medium text-sm outline-none"
-                            placeholder="Найти еду..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button 
-                            onClick={handleGeolocation}
-                            className="p-3 text-blue-600 hover:text-blue-700 transition-colors active:scale-95 border-l border-gray-100"
-                            title="Поделиться локацией"
-                        >
-                            <LocateFixed className="h-5 w-5" />
-                        </button>
-                    </div>
-                </div>
-
                 {/* Floating Category Filters */}
-                <div className="mt-auto pointer-events-auto px-4 w-full max-w-md mx-auto">
-                    <div className="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-2">
+                <div className="pointer-events-auto px-4 w-full max-w-md mx-auto">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                         {categories.map((cat) => {
                             const isActive = activeCategory === cat.id;
                             const Icon = cat.icon;
@@ -95,7 +72,7 @@ export default function Home() {
                                     className={`px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border transition-all ${
                                         isActive 
                                         ? 'bg-[#4CAF50] text-white border-[#4CAF50] shadow-md scale-105' 
-                                        : 'bg-white/70 backdrop-blur-md border-white/40 text-gray-800 hover:bg-white/90'
+                                        : 'bg-white/90 backdrop-blur-md border-white text-gray-800 hover:bg-white'
                                     }`}
                                 >
                                     <Icon className="w-4 h-4" /> 
@@ -106,10 +83,43 @@ export default function Home() {
                     </div>
                 </div>
 
+                {/* Bottom Section - Search & Location */}
+                <div className="pointer-events-auto px-4 w-full max-w-md mx-auto flex items-center gap-2">
+                    
+                    {/* Compact Search Bar */}
+                    <div className="relative flex-1 flex items-center bg-white/90 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-white">
+                        <div className="pl-4 pr-2 flex items-center pointer-events-none">
+                            <Search className="h-4 w-4 text-gray-500" />
+                        </div>
+                        <input
+                            type="text"
+                            onClick={() => setShowBottomSheet(false)}
+                            className="block w-full py-3 bg-transparent text-gray-900 border-none focus:ring-0 placeholder-gray-500 font-medium text-[15px] outline-none"
+                            placeholder="Найти еду..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button 
+                            onClick={handleGeolocation}
+                            className="p-3 bg-gray-50/50 rounded-r-2xl text-blue-600 hover:text-blue-700 transition-colors active:scale-95 border-l border-gray-100"
+                            title="Поделиться локацией"
+                        >
+                            <LocateFixed className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    {/* Button to restore bottom sheet */}
+                    <button 
+                        onClick={() => setShowBottomSheet(true)}
+                        className="bg-white/90 backdrop-blur-md p-3.5 rounded-2xl shadow-sm text-gray-700 hover:bg-white transition-colors active:scale-95 border border-white shrink-0"
+                    >
+                        <Store className="w-5 h-5" />
+                    </button>
+                </div>
             </div>
 
             {/* Draggable Bottom Sheet Layer */}
-            <BottomSheet>
+            <BottomSheet isOpen={showBottomSheet}>
                 <div className="pb-8">
                     <h2 className="text-xl font-bold mb-4 tracking-tight text-gray-900 px-1">Знаменитые кафешки</h2>
                     

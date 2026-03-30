@@ -6,6 +6,7 @@ interface MapProps {
     onCenterChange?: (lat: number, lng: number) => void;
     searchQuery?: string;
     activeCategory?: string | null;
+    onMapClick?: () => void;
 }
 
 const MapInner = dynamic(() => import('./MapInner'), {
