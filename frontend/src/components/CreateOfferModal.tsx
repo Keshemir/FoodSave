@@ -1,7 +1,5 @@
-'use client';
-
 import { useState } from 'react';
-import { X, Image as ImageIcon, MapPin, Coffee, Pizza, IceCream } from 'lucide-react';
+import { X, Image as ImageIcon, MapPin, Coffee, Flame, CakeSlice } from 'lucide-react';
 
 interface CreateOfferModalProps {
     isOpen: boolean;
@@ -75,43 +73,42 @@ export default function CreateOfferModal({ isOpen, onClose, onPickLocation, pick
                 onClose();
                 window.location.reload();
             } else {
-                alert('Не удалось создать объявление');
+                const errorText = await res.text();
+                alert(`Не удалось создать: ${errorText}`);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Ошибка при создании');
+            alert(`Ошибка сети: ${error.message}`);
         } finally {
             setLoading(false);
         }
     }
 
     return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                <div className="flex justify-between items-center p-4 border-b">
-                    <h3 className="font-bold text-lg">Новое объявление</h3>
-                    <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full">
-                        <X className="w-5 h-5 text-gray-500" />
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3">
+            <div className="bg-white w-full max-w-sm rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                    <h3 className="font-bold text-[17px] text-gray-900 tracking-tight">Новое объявление</h3>
+                    <button onClick={onClose} className="p-1.5 bg-gray-100 active:bg-gray-200 text-gray-500 rounded-full transition-colors">
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                <form onSubmit={handleSubmit} className="p-4 space-y-3">
 
                     {/* Type Toggle */}
-                    <div className="flex p-1 bg-gray-100 rounded-lg">
+                    <div className="flex p-1 bg-gray-100 rounded-xl">
                         <button
                             type="button"
                             onClick={() => setType('sale')}
-                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${type === 'sale' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'
-                                }`}
+                            className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all ${type === 'sale' ? 'bg-white shadow text-gray-900 scale-100' : 'text-gray-500 scale-95 hover:text-gray-700'}`}
                         >
                             Продажа
                         </button>
                         <button
                             type="button"
                             onClick={() => setType('free')}
-                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${type === 'free' ? 'bg-green-500 text-white shadow' : 'text-gray-500 hover:text-gray-700'
-                                }`}
+                            className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all ${type === 'free' ? 'bg-[#4CAF50] text-white shadow scale-100' : 'text-gray-500 scale-95 hover:text-gray-700'}`}
                         >
                             Бесплатно
                         </button>
@@ -119,127 +116,120 @@ export default function CreateOfferModal({ isOpen, onClose, onPickLocation, pick
 
                     {/* Category Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Категория</label>
                         <div className="grid grid-cols-3 gap-2">
                             <button
                                 type="button"
                                 onClick={() => setCategory('bakery')}
-                                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === 'bakery' ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                                    }`}
+                                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === 'bakery' ? 'border-orange-500 bg-orange-50 text-orange-700 scale-[1.02]' : 'border-gray-100 text-gray-400 bg-gray-50'}`}
                             >
-                                <Coffee className="w-6 h-6 mb-1" />
-                                <span className="text-xs font-medium">Выпечка</span>
+                                <Coffee className="w-5 h-5 mb-0.5" />
+                                <span className="text-[11px] font-bold">Выпечка</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setCategory('hot')}
-                                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === 'hot' ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                                    }`}
+                                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === 'hot' ? 'border-red-500 bg-red-50 text-red-700 scale-[1.02]' : 'border-gray-100 text-gray-400 bg-gray-50'}`}
                             >
-                                <Pizza className="w-6 h-6 mb-1" />
-                                <span className="text-xs font-medium">Горячее</span>
+                                <Flame className="w-5 h-5 mb-0.5" />
+                                <span className="text-[11px] font-bold">Горячее</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setCategory('cold')}
-                                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === 'cold' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                                    }`}
+                                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === 'cold' ? 'border-blue-500 bg-blue-50 text-blue-700 scale-[1.02]' : 'border-gray-100 text-gray-400 bg-gray-50'}`}
                             >
-                                <IceCream className="w-6 h-6 mb-1" />
-                                <span className="text-xs font-medium">Холодное</span>
+                                <CakeSlice className="w-5 h-5 mb-0.5" />
+                                <span className="text-[11px] font-bold">Десерты</span>
                             </button>
                         </div>
                     </div>
 
                     {/* Title Input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Название</label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none"
-                            placeholder="Например: Свежий хлеб"
+                            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-[14px] focus:bg-white focus:border-green-500 outline-none text-[15px] font-medium transition-colors placeholder:font-normal"
+                            placeholder="Название (например: Свежий хлеб)"
                             required
                         />
                     </div>
 
                     {/* Location Picker */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Местоположение</label>
                         <div className="flex space-x-2 mb-2">
                             <button
                                 type="button"
                                 onClick={onPickLocation}
-                                className={`flex-1 flex items-center justify-center space-x-2 py-3 border rounded-xl font-medium transition-colors ${pickedLocation ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                                    }`}
+                                className={`flex-1 flex items-center justify-center space-x-1.5 py-2.5 border rounded-[14px] text-[13px] font-bold transition-all ${pickedLocation ? 'border-[#4CAF50] bg-[#4CAF50]/10 text-[#4CAF50]' : 'border-gray-100 bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
                             >
-                                <MapPin className={`w-5 h-5 ${pickedLocation ? 'text-green-600' : 'text-gray-400'}`} />
+                                <MapPin className={`w-4 h-4 ${pickedLocation ? 'text-[#4CAF50]' : 'text-gray-400'}`} />
                                 <span>{pickedLocation ? 'Место выбрано' : 'Указать на карте'}</span>
                             </button>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 mt-2">
+                        <div className="grid grid-cols-3 gap-2">
                             <input
                                 type="text"
                                 value={entrance}
                                 onChange={(e) => setEntrance(e.target.value)}
-                                className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-green-500"
+                                className="w-full px-2 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[13px] font-medium outline-none focus:bg-white focus:border-green-500 transition-colors text-center"
                                 placeholder="Подъезд"
                             />
                             <input
                                 type="text"
                                 value={floor}
                                 onChange={(e) => setFloor(e.target.value)}
-                                className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-green-500"
+                                className="w-full px-2 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[13px] font-medium outline-none focus:bg-white focus:border-green-500 transition-colors text-center"
                                 placeholder="Этаж"
                             />
                             <input
                                 type="text"
                                 value={apt}
                                 onChange={(e) => setApt(e.target.value)}
-                                className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-green-500"
+                                className="w-full px-2 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[13px] font-medium outline-none focus:bg-white focus:border-green-500 transition-colors text-center"
                                 placeholder="Кв/Офис"
                             />
                         </div>
                     </div>
 
-                    {/* Image URL Input */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Фото (ссылка)</label>
-                        <div className="relative">
+                    {/* Image URL & Price Row */}
+                    <div className="flex gap-2">
+                        <div className="relative flex-[2]">
                             <input
                                 type="text"
                                 value={imageUrl}
                                 onChange={(e) => setImageUrl(e.target.value)}
-                                className="w-full p-3 pl-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-sm"
-                                placeholder="https://..."
+                                className="w-full px-3 py-2.5 pl-9 bg-gray-50 border border-gray-100 rounded-[14px] focus:bg-white focus:border-green-500 outline-none text-[13px] font-medium transition-colors"
+                                placeholder="Фото (ссылка)"
                             />
-                            <ImageIcon className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+                            <ImageIcon className="absolute left-3 top-[11px] w-4 h-4 text-gray-400" />
                         </div>
+                        
+                        {type === 'sale' && (
+                            <div className="flex-[1.2] relative">
+                                <input
+                                    type="number"
+                                    value={price}
+                                    onChange={(e) => setPrice(e.target.value)}
+                                    className="w-full px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-[14px] focus:bg-white focus:border-green-500 outline-none text-[14px] font-bold text-gray-900 transition-colors"
+                                    placeholder="1000"
+                                    required
+                                />
+                                <span className="absolute right-3 top-[10px] text-[14px] font-bold text-gray-400">₸</span>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Price Input */}
-                    {type === 'sale' && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Цена (₸)</label>
-                            <input
-                                type="number"
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value)}
-                                className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-lg font-bold"
-                                placeholder="1000"
-                                required
-                            />
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50"
-                    >
-                        {loading ? 'Публикуется...' : 'Опубликовать'}
-                    </button>
+                    <div className="pt-2">
+                        <button
+                            type="submit"
+                            disabled={loading || !pickedLocation}
+                            className="w-full bg-[#4CAF50] hover:bg-green-600 text-white font-bold py-3.5 rounded-[16px] transition-all disabled:opacity-50 disabled:active:scale-100 active:scale-[0.98] shadow-[0_4px_14px_rgba(76,175,80,0.3)] text-[15px]"
+                        >
+                            {loading ? 'Публикация...' : (!pickedLocation ? 'Выберите место на карте' : 'Опубликовать')}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
