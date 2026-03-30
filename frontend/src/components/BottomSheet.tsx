@@ -43,7 +43,7 @@ export default function BottomSheet({ children, isOpen = true }: BottomSheetProp
 
     return (
         <motion.div
-            className="absolute bottom-16 left-0 right-0 max-w-md mx-auto bg-white rounded-t-[20px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] overflow-hidden pointer-events-auto z-[20]"
+            className="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-white rounded-t-[20px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] overflow-hidden pointer-events-auto z-[20]"
             initial={{ height: peekHeight }}
             animate={controls}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}

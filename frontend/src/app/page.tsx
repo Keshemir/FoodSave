@@ -56,8 +56,8 @@ export default function Home() {
                 onMapClick={() => setShowBottomSheet(false)}
             />
 
-            {/* Discover UI Overlay (Docked to bottom, above Navbar which is h-16/bottom-0) */}
-            <div className={`absolute inset-x-0 bottom-[72px] pointer-events-none z-10 flex flex-col justify-end gap-3 pb-3 transition-opacity duration-300 ${showBottomSheet ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+            {/* Discover UI Overlay (Docked to bottom edge) */}
+            <div className={`absolute inset-x-0 bottom-4 pb-[env(safe-area-inset-bottom)] pointer-events-none z-10 flex flex-col justify-end gap-3 transition-opacity duration-300 ${showBottomSheet ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
                 
                 {/* Floating Category Filters */}
                 <div className="pointer-events-auto px-4 w-full max-w-md mx-auto">
