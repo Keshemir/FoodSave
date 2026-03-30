@@ -14,7 +14,7 @@ declare global {
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
-    const [showBottomSheet, setShowBottomSheet] = useState(true);
+    const [sheetState, setSheetState] = useState<'collapsed' | 'peek' | 'expanded'>('peek');
 
     const famousCafes = [
         { id: 1, name: 'Скуратов Ростерс', author: '@alex_coffee', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=400&h=300', span: 'col-span-2 row-span-1 h-32' },
@@ -53,11 +53,11 @@ export default function Home() {
                 }}
                 searchQuery={searchQuery}
                 activeCategory={activeCategory}
-                onMapClick={() => setShowBottomSheet(false)}
+                onMapClick={() => setSheetState('collapsed')}
             />
 
-            {/* Discover UI Overlay (Docked to bottom edge) */}
-            <div className={`absolute inset-x-0 bottom-4 pb-[env(safe-area-inset-bottom)] pointer-events-none z-10 flex flex-col justify-end gap-3 transition-opacity duration-300 ${showBottomSheet ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+            {/* Discover UI Overlay (Docked just above the BottomSheet Grabber) */}
+            <div className={`absolute inset-x-0 bottom-[48px] pb-[env(safe-area-inset-bottom)] pointer-events-none z-10 flex flex-col justify-end gap-3 transition-opacity duration-300 ${sheetState !== 'collapsed' ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
                 
                 {/* Floating Category Filters */}
                 <div className="pointer-events-auto px-4 w-full max-w-md mx-auto">
@@ -93,7 +93,7 @@ export default function Home() {
                         </div>
                         <input
                             type="text"
-                            onClick={() => setShowBottomSheet(false)}
+                            onClick={() => setSheetState('collapsed')}
                             className="block w-full py-3 bg-transparent text-gray-900 border-none focus:ring-0 placeholder-gray-500 font-medium text-[15px] outline-none"
                             placeholder="Найти еду..."
                             value={searchQuery}
@@ -107,19 +107,11 @@ export default function Home() {
                             <LocateFixed className="h-5 w-5" />
                         </button>
                     </div>
-
-                    {/* Button to restore bottom sheet */}
-                    <button 
-                        onClick={() => setShowBottomSheet(true)}
-                        className="bg-white/90 backdrop-blur-md p-3.5 rounded-2xl shadow-sm text-gray-700 hover:bg-white transition-colors active:scale-95 border border-white shrink-0"
-                    >
-                        <Store className="w-5 h-5" />
-                    </button>
                 </div>
             </div>
 
             {/* Draggable Bottom Sheet Layer */}
-            <BottomSheet isOpen={showBottomSheet}>
+            <BottomSheet state={sheetState} onStateChange={setSheetState}>
                 <div className="pb-8">
                     <h2 className="text-xl font-bold mb-4 tracking-tight text-gray-900 px-1">Знаменитые кафешки</h2>
                     
