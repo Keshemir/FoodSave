@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Map from '../components/Map';
-import { Search, Navigation, Utensils, Coffee, Wine, Plus, ChevronUp } from 'lucide-react';
+import BottomSheet from '../components/BottomSheet';
+import { Search, Navigation, Utensils, Coffee, Wine, Plus, ChevronUp, LocateFixed } from 'lucide-react';
 
 // window.__mapCenterCallback is registered by MainLayout
 declare global {
@@ -15,108 +16,118 @@ export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const famousCafes = [
-        { id: 1, name: 'Скуратов Ростерс', author: '@alex_coffee', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=400&h=300' },
-        { id: 2, name: 'Даблби', author: '@moscow_guide', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=400&h=300' },
-        { id: 3, name: 'Кофемания', author: '@foodie_ru', image: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=400&h=300' },
-        { id: 4, name: 'Surf Coffee', author: '@surf_vibes', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=400&h=300' },
+        { id: 1, name: 'Скуратов Ростерс', author: '@alex_coffee', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=400&h=300', span: 'col-span-2 row-span-1 h-32' },
+        { id: 2, name: 'Даблби', author: '@moscow_guide', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=300&h=400', span: 'col-span-1 row-span-2 h-48' },
+        { id: 3, name: 'Кофемания', author: '@foodie_ru', image: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=300&h=400', span: 'col-span-1 row-span-2 h-48' },
+        { id: 4, name: 'Surf Coffee', author: '@surf_vibes', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=400&h=300', span: 'col-span-2 row-span-1 h-32' },
     ];
 
+    const handleGeolocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    console.log("Current Location:", position.coords.latitude, position.coords.longitude);
+                    // In a full implementation, this would pan the map to these coordinates
+                    alert(`Текущая локация получена: \n${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
+                },
+                (error) => {
+                    console.error("Error getting location", error);
+                    alert("Не удалось определить локацию");
+                }
+            );
+        }
+    };
+
     return (
-        <main style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+        <main style={{ position: 'fixed', inset: 0, zIndex: 0 }} className="font-sans antialiased">
             <Map
                 onCenterChange={(lat, lng) => {
                     window.__mapCenterCallback?.(lat, lng);
                 }}
             />
 
-            {/* Discover UI Overlay - z-index ensures it's above the Map but below modal/navbar if needed */}
-            <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between overflow-hidden">
+            {/* Discover UI Overlay */}
+            <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden flex flex-col pt-[72px] pb-[160px]">
                 
                 {/* Top Section - Search & Location */}
-                {/* We add mt-20 to be below the Navbar which is typically h-16 (64px) */}
-                <div className="pointer-events-auto p-4 mt-20 flex items-center gap-3 max-w-md mx-auto w-full">
-                    <div className="relative flex-1">
+                <div className="pointer-events-auto px-4 flex items-start gap-3 max-w-md mx-auto w-full justify-between">
+                    
+                    {/* Compact Search Bar Top-Left */}
+                    <div className="relative flex-1 max-w-[240px]">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
+                            <Search className="h-4 w-4 text-gray-500" />
                         </div>
                         <input
                             type="text"
-                            className="block w-full pl-11 pr-4 py-3.5 bg-black text-white rounded-full shadow-lg border-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 font-medium text-sm"
-                            placeholder="search for something"
+                            className="block w-full pl-10 pr-4 py-3 bg-white/80 backdrop-blur-md text-gray-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none focus:ring-2 focus:ring-green-500 placeholder-gray-500 font-medium text-sm transition-all"
+                            placeholder="Поиск..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <button className="bg-white p-3.5 rounded-full shadow-lg shrink-0 text-black hover:bg-gray-50 transition-colors">
-                        <Navigation className="h-6 w-6" />
+
+                    {/* Geolocation Button */}
+                    <button 
+                        onClick={handleGeolocation}
+                        className="bg-white/90 backdrop-blur-md p-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shrink-0 text-blue-600 hover:bg-white transition-colors active:scale-95"
+                    >
+                        <LocateFixed className="h-5 w-5" />
                     </button>
-                    {/* Ghost button for 'search here' functionality floating above map center */}
-                    <button className="absolute top-40 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-md hover:bg-white transition-colors">
-                        <Search className="w-4 h-4" />
-                        search here
-                    </button>
+                    
                 </div>
 
-                {/* Bottom Section - Filters & Cards */}
-                <div className="w-full max-w-md mx-auto relative mt-auto pb-16">
-                    {/* Floating Filters */}
-                    <div className="pointer-events-auto flex items-center gap-2 px-4 mb-4 overflow-x-auto no-scrollbar scroll-smooth">
-                        <button className="bg-black text-white px-4 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 shrink-0 shadow-md">
+                {/* Floating Filters (placed near bottom of the available free space) */}
+                <div className="mt-auto pointer-events-auto px-4 w-full max-w-md mx-auto">
+                    <div className="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-2">
+                        <button className="bg-black/90 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-2 shrink-0 shadow-sm border border-black/10">
                             <span>discover</span>
-                            <ChevronUp className="w-4 h-4 text-white p-0.5 rounded-full bg-white/20" />
+                            <ChevronUp className="w-4 h-4 text-white p-[2px] rounded-full bg-white/20" />
                         </button>
-                        <button className="bg-white px-4 py-2.5 rounded-full font-bold text-sm flex items-center gap-1.5 shrink-0 shadow-md whitespace-nowrap text-gray-800">
-                            <Utensils className="w-4 h-4 text-gray-400" />
-                            eat
+                        <button className="bg-white/70 backdrop-blur-md px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border border-white/40 text-gray-800 transition-colors hover:bg-white/90">
+                            <Utensils className="w-4 h-4 text-gray-500" /> eat
                         </button>
-                        <button className="bg-white px-4 py-2.5 rounded-full font-bold text-sm flex items-center gap-1.5 shrink-0 shadow-md whitespace-nowrap text-gray-800">
-                            <Coffee className="w-4 h-4 text-gray-400" />
-                            café
+                        <button className="bg-white/70 backdrop-blur-md px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border border-white/40 text-gray-800 transition-colors hover:bg-white/90">
+                            <Coffee className="w-4 h-4 text-gray-500" /> café
                         </button>
-                        <button className="bg-white px-4 py-2.5 rounded-full font-bold text-sm flex items-center gap-1.5 shrink-0 shadow-md whitespace-nowrap text-gray-800">
-                            <Wine className="w-4 h-4 text-gray-400" />
-                            bar
+                        <button className="bg-white/70 backdrop-blur-md px-4 py-2.5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 shrink-0 shadow-sm border border-white/40 text-gray-800 transition-colors hover:bg-white/90">
+                            <Wine className="w-4 h-4 text-gray-500" /> bar
                         </button>
-                        <button className="bg-white w-10 h-[40px] rounded-full flex items-center justify-center shrink-0 shadow-md">
+                        <button className="bg-white/70 backdrop-blur-md w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-white/40 transition-colors hover:bg-white/90">
                             <Plus className="w-5 h-5 text-gray-500" />
                         </button>
                     </div>
+                </div>
 
-                    {/* Bottom Sheet Card */}
-                    <div className="pointer-events-auto bg-white rounded-t-3xl shadow-2xl overflow-hidden min-h-[300px] border border-gray-100">
-                        <div className="p-6">
-                            <h2 className="text-xl font-bold mb-4 tracking-tight text-gray-900">знаменитые кафешки</h2>
-                            
-                            {/* Horizontal Cards */}
-                            <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar -mx-6 px-6 snap-x snap-mandatory">
-                                {famousCafes.map((cafe) => (
-                                    <div key={cafe.id} className="relative w-[180px] shrink-0 h-[220px] rounded-2xl overflow-hidden snap-center group select-none shadow-sm cursor-pointer">
-                                        <img 
-                                            src={cafe.image} 
-                                            alt={cafe.name} 
-                                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                                        <div className="absolute bottom-4 left-4 right-4 text-white">
-                                            <p className="text-xs font-medium text-white/80 mb-1">{cafe.author}</p>
-                                            <p className="font-bold text-lg leading-tight">{cafe.name}</p>
-                                        </div>
-                                    </div>
-                                ))}
+            </div>
+
+            {/* Draggable Bottom Sheet Layer */}
+            <BottomSheet>
+                <div className="pb-8">
+                    <h2 className="text-xl font-bold mb-4 tracking-tight text-gray-900 px-1">знаменитые кафешки</h2>
+                    
+                    {/* Bento Grid Layout for Cards */}
+                    <div className="grid grid-cols-2 gap-3 pb-8">
+                        {famousCafes.map((cafe) => (
+                            <div key={cafe.id} className={`relative rounded-[20px] overflow-hidden group select-none shadow-sm cursor-pointer border border-gray-100/50 ${cafe.span || 'h-40'}`}>
+                                <img 
+                                    src={cafe.image} 
+                                    alt={cafe.name} 
+                                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                />
+                                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                                <div className="absolute bottom-3 left-3 right-3 text-white">
+                                    <p className="text-[10px] font-medium text-white/80 mb-0.5 tracking-wide uppercase">{cafe.author}</p>
+                                    <p className="font-bold text-[15px] leading-tight drop-shadow-md">{cafe.name}</p>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
-            </div>
-            {/* Styles to block scrollbars but keep smooth scrolling for horizontal lists */}
+            </BottomSheet>
+
             <style jsx global>{`
-                .no-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .no-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
+                .no-scrollbar::-webkit-scrollbar { display: none; }
+                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
         </main>
     );
